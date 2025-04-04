@@ -1,0 +1,59 @@
+name: UpdateBadges
+concurrency:
+  group: update-contract-badge-${{ github.head_ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: main
+    paths:
+      - flake.nix
+      - flake.lock
+
+jobs:
+  UpdateBadges:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: cachix/install-nix-action@v30
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+          github_access_token: ${{ secrets.WALRUSACCESSTOKEN }}
+
+      - name: Generate sui version value
+        id: sui-version
+        run: |
+          SUIVERSION="$(nix --accept-flake-config develop -c sui-move -V | awk '{print $2}')"
+          echo "##[set-output name=sui-version;]${SUIVERSION}"
+
+      - name: Generate sui version badge SVG image
+        uses: emibcn/badge-action@v2
+        with:
+          label: 'Sui'
+          status: ${{ steps.sui-version.outputs.sui-version }}
+          color: 4da2ff
+          path: .github/badges/sui-version-badge.svg
+
+      - name: Commit badge
+        id: commit-badge
+        continue-on-error: true
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Antonio Yang"
+          git add .github/badges/*
+          git commit -m "update sui version badge"
+
+          # TODO make PR for upstram github action
+          git pull
+      - name: Push badge commit
+        if: steps.commit-badge.outcome == 'success' && steps.commit-badge.conclusion == 'success'
+        uses: ad-m/github-push-action@master
+        with:
+          branch: ${{ github.head_ref }}

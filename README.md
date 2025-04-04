@@ -1,2 +1,3 @@
-# TCD
-Thermal Coin Detector for Sui
+TCD
+---
+The thermal conductivity detector (**TCD**), also known as a katharometer, is a bulk property detector and a chemical specific detector commonly used in gas chromatography.  This detector senses changes in the thermal conductivity of the column eluent and compares it to a reference flow of carrier gas. Since most compounds have a thermal conductivity much less than that of the common carrier gases of helium or hydrogen, when an analyte elutes from the column the effluent thermal conductivity is reduced, and a detectable signal is produced.  Nowadays, it is commonly used for water quality detection. The thermal coin detector (**TCD**) for Sui use the same idea to know the quality of the _water_ by some coin as the conductivity.
